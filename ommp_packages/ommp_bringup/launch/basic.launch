@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+  <!-- launch gazebo with the specified world -->
+  <include file="$(find ommp_bringup)/launch/sim_bringup.launch">
+    <arg name="world" value="jackal_race"/>
+  </include>
+
+  <!-- launch moveit -->
+  <include file="$(find ommp_moveit_interface)/launch/moveit.launch" />
+
+  <!-- launch the moveit node -->
+  <node name="set_start_pos" pkg="ommp_moveit_interface" type="set_start_pos.py" respawn="false" />
+
+  <!-- launch rviz -->
+  <include file="$(find ommp_navigation)/launch/navigation_main.launch">
+    <arg name="map" value="jackal_race"/>
+  </include> 
+
+  <!-- launch rviz -->
+  <include file="$(find ommp_viz)/launch/rviz.launch">
+    <arg name="config" value="navigation"/>
+  </include>
+
+</launch>
+
