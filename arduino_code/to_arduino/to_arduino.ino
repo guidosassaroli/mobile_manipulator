@@ -37,23 +37,24 @@ Encoder encoder_bright(31, 30);
 
 
 // Initialize pin numbers
+// commented by Sax
 
-const uint8_t LF_PWM = 2;
-const uint8_t RF_PWM = 3;
-const uint8_t LB_PWM = 4;
-const uint8_t RB_PWM = 5;
+// const uint8_t LF_PWM = 2;
+// const uint8_t RF_PWM = 3;
+// const uint8_t LB_PWM = 4;
+// const uint8_t RB_PWM = 5;
 
-const uint8_t LF_BACK = 23;
-const uint8_t LF_FORW = 22;
+// const uint8_t LF_BACK = 23;
+// const uint8_t LF_FORW = 22;
 
-const uint8_t RF_BACK = 24;
-const uint8_t RF_FORW = 25;
+// const uint8_t RF_BACK = 24;
+// const uint8_t RF_FORW = 25;
 
-const uint8_t LB_BACK = 27;
-const uint8_t LB_FORW = 26;
+// const uint8_t LB_BACK = 27;
+// const uint8_t LB_FORW = 26;
 
-const uint8_t RB_BACK = 28;
-const uint8_t RB_FORW = 29;
+// const uint8_t RB_BACK = 28;
+// const uint8_t RB_FORW = 29;
 bool wtf;
 
 
@@ -109,54 +110,55 @@ void onTwist(const std_msgs::Float32MultiArray& msg)
 
 
 ros::Subscriber<std_msgs::Float32MultiArray> cmd_sub("set_vel", &onTwist);
-
 ros::Subscriber<std_msgs::Int16MultiArray> pid_sub("pid_set", &onPid_cb);
 
 // Move any motor function with speed_pwm value and pin numbers
+// commented by Sax 
 
-void Move_motor(int speed_pwm,const uint8_t pwm,const uint8_t forw,const uint8_t back)
-{
-  if(speed_pwm >= 0)
-  {
-    digitalWrite(forw, HIGH);
-    digitalWrite(back, LOW);
-    analogWrite(pwm, abs(speed_pwm));
-  }
-  else if(speed_pwm < 0)
-  {
-    digitalWrite(forw, LOW);
-    digitalWrite(back, HIGH);
-    analogWrite(pwm, abs(speed_pwm));
-  }
-}
+// void Move_motor(int speed_pwm,const uint8_t pwm,const uint8_t forw,const uint8_t back)
+// {
+//   if(speed_pwm >= 0)
+//   {
+//     digitalWrite(forw, HIGH);
+//     digitalWrite(back, LOW);
+//     analogWrite(pwm, abs(speed_pwm));
+//   }
+//   else if(speed_pwm < 0)
+//   {
+//     digitalWrite(forw, LOW);
+//     digitalWrite(back, HIGH);
+//     analogWrite(pwm, abs(speed_pwm));
+//   }
+// }
 
 
 
 // Initialize pins for forward movement
+// commented by Sax 
 
-void setpins()
-{
-  pinMode(LF_FORW,OUTPUT);
-  pinMode(LF_BACK,OUTPUT);
-  pinMode(RF_FORW,OUTPUT);
-  pinMode(RF_BACK,OUTPUT);
-  pinMode(LF_PWM,OUTPUT);
-  pinMode(RF_PWM,OUTPUT);
-  pinMode(LB_FORW,OUTPUT);
-  pinMode(LB_BACK,OUTPUT);
-  pinMode(RB_FORW,OUTPUT);
-  pinMode(RB_BACK,OUTPUT);
-  pinMode(LB_PWM,OUTPUT);
-  pinMode(RB_PWM,OUTPUT);
-  digitalWrite(LF_FORW, HIGH);
-  digitalWrite(LF_BACK, LOW);
-  digitalWrite(RF_FORW, HIGH);
-  digitalWrite(RF_BACK, LOW);
-  digitalWrite(LB_FORW, HIGH);
-  digitalWrite(LB_BACK, LOW);
-  digitalWrite(RB_FORW, HIGH);
-  digitalWrite(RB_BACK, LOW);
-}
+// void setpins() 
+// {
+//   pinMode(LF_FORW,OUTPUT);
+//   pinMode(LF_BACK,OUTPUT);
+//   pinMode(RF_FORW,OUTPUT);
+//   pinMode(RF_BACK,OUTPUT);
+//   pinMode(LF_PWM,OUTPUT);
+//   pinMode(RF_PWM,OUTPUT);
+//   pinMode(LB_FORW,OUTPUT);
+//   pinMode(LB_BACK,OUTPUT);
+//   pinMode(RB_FORW,OUTPUT);
+//   pinMode(RB_BACK,OUTPUT);
+//   pinMode(LB_PWM,OUTPUT);
+//   pinMode(RB_PWM,OUTPUT);
+//   digitalWrite(LF_FORW, HIGH);
+//   digitalWrite(LF_BACK, LOW);
+//   digitalWrite(RF_FORW, HIGH);
+//   digitalWrite(RF_BACK, LOW);
+//   digitalWrite(LB_FORW, HIGH);
+//   digitalWrite(LB_BACK, LOW);
+//   digitalWrite(RB_FORW, HIGH);
+//   digitalWrite(RB_BACK, LOW);
+// }
 
 //void reset Integral error when we stop
 void reset_pid_Ki()
@@ -289,11 +291,12 @@ void loop() {
   }
 
   // Move the motors with the output of the pid
+  // commented by Sax 
   
-  Move_motor(Output_fl,LF_PWM,LF_FORW,LF_BACK);
-  Move_motor(Output_fr,RF_PWM,RF_FORW,RF_BACK);
-  Move_motor(Output_bl,LB_PWM,LB_FORW,LB_BACK);
-  Move_motor(Output_br,RB_PWM,RB_FORW,RB_BACK);
+  // Move_motor(Output_fl,LF_PWM,LF_FORW,LF_BACK);
+  // Move_motor(Output_fr,RF_PWM,RF_FORW,RF_BACK);
+  // Move_motor(Output_bl,LB_PWM,LB_FORW,LB_BACK);
+  // Move_motor(Output_br,RB_PWM,RB_FORW,RB_BACK);
 
   // spin the ros node
   

@@ -12,6 +12,8 @@
       <arg name="load_robot_description" value="false" />
     </include>   
   </group>
+
+  <!-- Sax thinks this can be commented-->
   <group if="$(arg real)">
     <include file="$(find ommp_real_moveit_config)/launch/move_group.launch">
       <arg name="publish_monitored_planning_scene" value="true" />
