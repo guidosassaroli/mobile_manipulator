@@ -5,23 +5,23 @@
 1) basic.launch 
 
 2) ommp_bringup/launch/sim_bringup.launch
-3) gazebo_ros)/launch/empty_world.launch 
-4) robot_state_publisher, controller_spawner, controller_manager_group, robot_loalization 
+2) gazebo_ros)/launch/empty_world.launch 
+2) robot_state_publisher, controller_spawner, controller_manager_group, robot_loalization 
 
-5) ommp_moveit_interface/launch/moveit.launch
-6) ommp_sim_moveit_config/launch/move_group.launch
-7) ommp_real_moveit_config/launch/move_group.launch
+3) ommp_moveit_interface/launch/moveit.launch
+3) ommp_sim_moveit_config/launch/move_group.launch
+3) ommp_real_moveit_config/launch/move_group.launch
 
-8) moveit node 
+4) moveit node 
 
-9) ommp_navigation/launch/navigation_main.launch
+5) ommp_navigation/launch/navigation_main.launch
 Run the map server and load the map file 
-10) ommp_navigation/launch/include/amcl.launch
-11) ommp_navigation/launch/include/amcl.launch AMCL params 
+5) ommp_navigation/launch/include/amcl.launch
+5) ommp_navigation/launch/include/amcl.launch AMCL params 
 
-12) ommp_navigation/launch/include/move_base.launch 
+6) ommp_navigation/launch/include/move_base.launch 
 
-13) rviz node 
+7) rviz node 
 
 
 
