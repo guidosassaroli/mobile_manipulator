@@ -67,8 +67,7 @@ ros::NodeHandle nh;
 std_msgs::Int64MultiArray enc_ticks;
 std_msgs::Float64MultiArray vel_wheels;
 ros::Publisher enc_ticks_pub("encoder_ticks", &enc_ticks);
-//ros::Publisher vel_pub("velocity_wheels", &vel_wheels);
-
+ros::Publisher vel_pub("velocity_wheels", &vel_wheels); //
 
 
 
@@ -220,17 +219,20 @@ void setup() {
   enc_ticks.data_length = 4;
 
   // vel array initialization
-  //char dim1_label[] = "velocity_wheels";
-  //vel_wheels.layout.dim = (std_msgs::MultiArrayDimension *) malloc(sizeof(std_msgs::MultiArrayDimension) * 2);
-  //vel_wheels.layout.dim[0].label = dim1_label;
-  //vel_wheels.layout.dim[0].size = 4;
-  //vel_wheels.layout.dim[0].stride = 1*4;
-  //vel_wheels.data = (float *)malloc(sizeof(float)*4);
-  //vel_wheels.layout.dim_length = 0;
-  //vel_wheels.data_length = 4;
+  
+  // they were commented: from here
+  char dim1_label[] = "velocity_wheels";
+  vel_wheels.layout.dim = (std_msgs::MultiArrayDimension *) malloc(sizeof(std_msgs::MultiArrayDimension) * 2);
+  vel_wheels.layout.dim[0].label = dim1_label;
+  vel_wheels.layout.dim[0].size = 4;
+  vel_wheels.layout.dim[0].stride = 1*4;
+  vel_wheels.data = (float *)malloc(sizeof(float)*4);
+  vel_wheels.layout.dim_length = 0;
+  vel_wheels.data_length = 4;
+  // to here
   
   nh.advertise(enc_ticks_pub);
-  //nh.advertise(vel_pub);
+  nh.advertise(vel_pub); // was commented
   nh.subscribe(cmd_sub);
   nh.subscribe(pid_sub);
 
@@ -270,11 +272,11 @@ void loop() {
   Input_fr = (float(ct2 - old_ct2) / ticks_per_meter) / ((now - prev) / 1000.0);
   Input_bl = (float(ct3 - old_ct3) / ticks_per_meter) / ((now - prev) / 1000.0);
   Input_br = (float(ct4 - old_ct4) / ticks_per_meter) / ((now - prev) / 1000.0);
-  //vel_wheels.data[0] = Input_fl;
-  //vel_wheels.data[1] = Input_fr;
-  //vel_wheels.data[2] = Input_bl;
-  //vel_wheels.data[3] = Input_br;
-  //vel_pub.publish(&vel_wheels);
+  vel_wheels.data[0] = Input_fl; //
+  vel_wheels.data[1] = Input_fr;//
+  vel_wheels.data[2] = Input_bl;//
+  vel_wheels.data[3] = Input_br;//
+  vel_pub.publish(&vel_wheels);//
   // Compute  Pid
   myPID_fl.Compute();
   myPID_fr.Compute();
