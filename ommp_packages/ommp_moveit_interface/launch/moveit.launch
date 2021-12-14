@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
-  <arg name="sim" default="false"/>
+  <arg name="sim" default="true"/>
   <arg name="real" default="false"/>
 
   <group if="$(arg sim)">
@@ -13,7 +13,7 @@
     </include>   
   </group>
 
-  <!-- Sax thinks this can be commented-->
+  <!-- Sax thinks this can be commented
   <group if="$(arg real)">
     <include file="$(find ommp_real_moveit_config)/launch/move_group.launch">
       <arg name="publish_monitored_planning_scene" value="true" />
@@ -21,7 +21,7 @@
       <arg name="info" value="true"/>
       <arg name="load_robot_description" value="false" />
     </include>   
-  </group>
+  </group> -->
 
 
 </launch>
