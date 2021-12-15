@@ -26,7 +26,7 @@
 <!--Macro of the arm -->
 
 <xacro:macro name="generic_arm" params="prefix parent 
-  transmission_hw_interface:=hardware_interface/PositionJointInterface
+  transmission_hw_interface:=hardware_interface/EffortJointInterface
   safety_limits:=false safety_pos_margin:=0.15
   safety_k_position:=20">
 
