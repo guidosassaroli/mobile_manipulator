@@ -147,7 +147,6 @@ arm:
     - SPARS
     - SPARStwo
 gripper:
-  default_planner_config: None
   planner_configs:
     - SBL
     - EST

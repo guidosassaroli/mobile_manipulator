@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(ommp_real_moveit_config)
+cmake_minimum_required(VERSION 3.1.3)
+project(ommp_lisa_moveit_config)
 
 find_package(catkin REQUIRED)
 
