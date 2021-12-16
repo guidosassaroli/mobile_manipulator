@@ -4,7 +4,7 @@
   
 
   <!-- Hardware Interface e.g Pos Eff -->
-  <xacro:property name="transmission_hw_interface" value="hardware_interface/PositionJointInterface" />
+  <xacro:property name="transmission_hw_interface" value="hardware_interface/EffortJointInterface" />
 
   <!-- enable safety limits -->
   <xacro:property name="safety_limits" value="false" />

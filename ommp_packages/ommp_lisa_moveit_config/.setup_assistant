@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: Panagiotis Angelakis
     author_email: panagiotis.angelakis.robot@gmail.com
-    generated_timestamp: 1639491922
+    generated_timestamp: 1639606258
