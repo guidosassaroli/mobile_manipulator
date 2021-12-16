@@ -53,33 +53,33 @@ arm_controller:
     - wrist_3_joint
   gains:
     shoulder_pan_joint:
-      p: 300
-      d: 1
+      p: 5000
+      d: 0
       i: 1
       i_clamp: 1
     shoulder_lift_joint:
-      p: 300
-      d: 1
+      p: 5000
+      d: 0
       i: 1
       i_clamp: 1
     elbow_joint:
-      p: 300
-      d: 1
+      p: 100
+      d: 0
       i: 1
       i_clamp: 1
     wrist_1_joint:
-      p: 300
-      d: 1
+      p: 100
+      d: 0
       i: 1
       i_clamp: 1
     wrist_2_joint:
-      p: 300
-      d: 1
+      p: 100
+      d: 0
       i: 1
       i_clamp: 1
     wrist_3_joint:
-      p: 300
-      d: 1
+      p: 100
+      d: 0
       i: 1
       i_clamp: 1
 gripper_controller:
@@ -89,12 +89,12 @@ gripper_controller:
     - finger2_joint
   gains:
     finger1_joint:
-      p: 100
-      d: 1
-      i: 1
+      p: 1
+      d: 0
+      i: 0
       i_clamp: 1
     finger2_joint:
-      p: 100
-      d: 1
-      i: 1
+      p: 1
+      d: 0
+      i: 0
       i_clamp: 1
