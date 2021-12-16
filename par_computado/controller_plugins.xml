@@ -1,0 +1,5 @@
+<library path="lib/libmy_controller_lib">
+  <class name="par_computado/ParComputado"
+         type="par_computado_ns::ParComputado"
+         base_class_type="controller_interface::ControllerBase" />
+</library>

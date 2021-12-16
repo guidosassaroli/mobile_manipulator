@@ -3,10 +3,10 @@
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/Float64.h>
 
-namespace my_controller_ns
+namespace par_computado_ns
 {
 
-    class MyPositionController : public controller_interface::Controller<hardware_interface::EffortJointInterface>
+    class ParComputado : public controller_interface::Controller<hardware_interface::EffortJointInterface>
     {
 
         bool init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle &n)
@@ -28,7 +28,7 @@ namespace my_controller_ns
             }
 
             // Start command subscriber
-            sub_command_ = n.subscribe<std_msgs::Float64>("command", 1, &MyPositionController::setCommandCB, this);
+            sub_command_ = n.subscribe<std_msgs::Float64>("command", 1, &ParComputado::setCommandCB, this);
 
             return true;
         }
@@ -56,5 +56,5 @@ namespace my_controller_ns
 
     };
 
-    PLUGINLIB_EXPORT_CLASS(my_controller_ns::MyPositionController, controller_interface::ControllerBase);
+    PLUGINLIB_EXPORT_CLASS(par_computado_ns::ParComputado, controller_interface::ControllerBase);
 }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(my_controller)
+project(par_computado)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -105,7 +105,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES my_controller
+#  LIBRARIES par_computado
 #  CATKIN_DEPENDS controller_interface hardware_interface pluginlib roscpp
 #  DEPENDS system_lib
 )
@@ -123,9 +123,9 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/my_controller.cpp
+#   src/${PROJECT_NAME}/par_computado.cpp
 # )
-add_library(my_controller_lib src/my_controller.cpp)
+add_library(my_controller_lib src/par_computado.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
