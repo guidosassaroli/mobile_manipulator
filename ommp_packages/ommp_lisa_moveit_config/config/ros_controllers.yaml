@@ -20,14 +20,29 @@ hardware_interface:
   sim_control_mode: 1  # 0: position, 1: velocity
 # Publish all joint states
 # Creates the /joint_states topic necessary in ROS
+
+# arm:
+#   joint_state_controller:
+#     type: joint_state_controller/JointStateController
+#     publish_rate: 100
+#   arm_controller:
+#     type: par_computado/ParComputado
+#     joints:
+#     - shoulder_pan_joint
+#     - shoulder_lift_joint
+#     - elbow_joint
+#     - wrist_1_joint
+#     - wrist_2_joint
+#     - wrist_3_joint 
+
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 controller_list:
   - name: arm_controller
-    action_ns: follow_joint_trajectory
+    action_ns: par_computado_ns
     default: True
-    type: FollowJointTrajectory
+    type: par_computado/ParComputado
     joints:
       - shoulder_pan_joint
       - shoulder_lift_joint
@@ -35,6 +50,17 @@ controller_list:
       - wrist_1_joint
       - wrist_2_joint
       - wrist_3_joint
+  # - name: arm_controller
+  #   action_ns: follow_joint_trajectory
+  #   default: True
+  #   type: FollowJointTrajectory
+  #   joints:
+  #     - shoulder_pan_joint
+  #     - shoulder_lift_joint
+  #     - elbow_joint
+  #     - wrist_1_joint
+  #     - wrist_2_joint
+  #     - wrist_3_joint
   - name: gripper_controller
     action_ns: follow_joint_trajectory
     default: True
@@ -42,46 +68,46 @@ controller_list:
     joints:
       - finger1_joint
       - finger2_joint
-arm_controller:
-  type: effort_controllers/JointTrajectoryController
-  joints:
-    - shoulder_pan_joint
-    - shoulder_lift_joint
-    - elbow_joint
-    - wrist_1_joint
-    - wrist_2_joint
-    - wrist_3_joint
-  gains:
-    shoulder_pan_joint:
-      p: 5000
-      d: 0
-      i: 1
-      i_clamp: 1
-    shoulder_lift_joint:
-      p: 5000
-      d: 0
-      i: 1
-      i_clamp: 1
-    elbow_joint:
-      p: 100
-      d: 0
-      i: 1
-      i_clamp: 1
-    wrist_1_joint:
-      p: 100
-      d: 0
-      i: 1
-      i_clamp: 1
-    wrist_2_joint:
-      p: 100
-      d: 0
-      i: 1
-      i_clamp: 1
-    wrist_3_joint:
-      p: 100
-      d: 0
-      i: 1
-      i_clamp: 1
+# arm_controller:
+#   type: par_computado/ParComputado
+#   joints:
+#     - shoulder_pan_joint
+#     - shoulder_lift_joint
+#     - elbow_joint
+#     - wrist_1_joint
+#     - wrist_2_joint
+#     - wrist_3_joint
+  # gains:
+  #   shoulder_pan_joint:
+  #     p: 5000
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
+  #   shoulder_lift_joint:
+  #     p: 5000
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
+  #   elbow_joint:
+  #     p: 100
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
+  #   wrist_1_joint:
+  #     p: 100
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
+  #   wrist_2_joint:
+  #     p: 100
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
+  #   wrist_3_joint:
+  #     p: 100
+  #     d: 0
+  #     i: 1
+  #     i_clamp: 1
 gripper_controller:
   type: effort_controllers/JointTrajectoryController
   joints:
