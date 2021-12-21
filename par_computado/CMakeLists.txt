@@ -125,7 +125,7 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/par_computado.cpp
 # )
-add_library(my_controller_lib src/par_computado.cpp)
+add_library(par_computado_lib src/par_computado.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -151,7 +151,7 @@ add_library(my_controller_lib src/par_computado.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(my_controller_lib ${catkin_LIBRARIES})
+target_link_libraries(par_computado_lib ${catkin_LIBRARIES})
 
 
 #############
