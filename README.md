@@ -1,5 +1,18 @@
 # SCHEME OF THE REPOSITORY 
 
+## launch sequence 
+
+roslaunch ommp_lisa_moveit_config gazebo.launch
+
+roslaunch ommp_moveit_interface moveit.launch
+
+*facoltativo*
+rosrun ommp_moveit_interface set_start_pos.py 
+
+roslaunch ommp_lisa_moveit_config moveit_rviz.launch
+
+
+
 ## launch tree 
 
 1- basic.launch 
