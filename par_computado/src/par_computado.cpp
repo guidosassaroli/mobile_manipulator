@@ -68,8 +68,9 @@ namespace par_computado_ns
 /*             command_ = joint_.getPosition();  // set the current joint goal to the current INITIAL joint position
  */
             //every time a new command arrives it runs the callback
-/*             sub_command_ = n.subscribe<std_msgs::Float64>("command", 1000, &ParComputado::setCommandCB, this);
- */            sub_command_=n.subscribe("command",1000, &ParComputado::commandCB, this);
+/*             sub_command_ = n.subscribe<std_msgs::Float64>("command", 1000, &ParComputado::setCommandCB, this);*/
+            
+            sub_command_=n.subscribe("command",1000, &ParComputado::commandCB, this);
 
             std::string robot_desc_string;
             if(!n.getParam("/robot_description",robot_desc_string))

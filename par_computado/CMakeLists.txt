@@ -126,6 +126,8 @@ include_directories(
 #   src/${PROJECT_NAME}/par_computado.cpp
 # )
 add_library(par_computado_lib src/par_computado.cpp)
+add_library(par_computado_lib2 src/par_computado_vel.cpp)
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -152,6 +154,8 @@ add_library(par_computado_lib src/par_computado.cpp)
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(par_computado_lib ${catkin_LIBRARIES})
+target_link_libraries(par_computado_lib2 ${catkin_LIBRARIES})
+
 
 
 #############
