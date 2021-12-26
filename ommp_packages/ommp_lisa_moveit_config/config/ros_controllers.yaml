@@ -41,10 +41,10 @@ joint_state_controller:
 
 controller_manager_ns: /par_computado_ns
 controller_list:
-  - name: par_computado/ParComputado
-    action_ns: par_computado
+  - name: arm_controller
+    action_ns: follow_joint_trajectory
     default: True
-    type: ParComputado
+    type: FollowJointTrajectory
     joints:
       - shoulder_pan_joint
       - shoulder_lift_joint

@@ -1,3 +1,4 @@
+#include <ros/ros.h>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <pluginlib/class_list_macros.h>
@@ -11,6 +12,9 @@
 #include <kdl/frames.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
+
+//include amjack0 
+#include "actionlib/server/simple_action_server.h"
 
 
 namespace par_computado_ns
@@ -178,6 +182,9 @@ namespace par_computado_ns
             ros::Subscriber sub_command_;
             ros::Subscriber traj_sub;
             std::vector<hardware_interface::JointHandle> joints_;
+
+            
+
 
     };
     PLUGINLIB_EXPORT_CLASS(par_computado_ns::ParComputado, controller_interface::ControllerBase);

@@ -4,6 +4,10 @@
   <arg name="sim" default="true"/>
   <arg name="real" default="false"/>
 
+  <!-- Remap follow_joint_trajectory -->     
+  <!-- <remap if="$(arg sim)" from="/follow_joint_trajectory" to="/arm_controller/follow_joint_trajectory"/> -->
+
+  <!-- Launche moveit -->
   <group if="$(arg sim)">
     <include file="$(find ommp_lisa_moveit_config)/launch/move_group.launch">
       <arg name="publish_monitored_planning_scene" value="true" />
