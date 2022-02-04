@@ -12,11 +12,16 @@ find_package(catkin REQUIRED COMPONENTS
   hardware_interface
   pluginlib
   roscpp
+  gazebo_ros
+  rospy
+  std_msgs
+  actionlib
+  actionlib_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -108,17 +113,22 @@ catkin_package(
 #  LIBRARIES par_computado
 #  CATKIN_DEPENDS controller_interface hardware_interface pluginlib roscpp
 #  DEPENDS system_lib
+ DEPENDS roscpp gazebo_ros actionlib
 )
 
 ###########
 ## Build ##
 ###########
 
+link_directories(${GAZEBO_LIBRARY_DIRS})
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
 # include
+  ${Boost_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
   )
 
 ## Declare a C++ library
@@ -126,7 +136,7 @@ include_directories(
 #   src/${PROJECT_NAME}/par_computado.cpp
 # )
 add_library(par_computado_lib src/par_computado.cpp)
-add_library(par_computado_lib2 src/par_computado_vel.cpp)
+# add_library(par_computado_lib2 src/par_computado_vel.cpp)
 
 
 ## Add cmake target dependencies of the library
@@ -153,10 +163,8 @@ add_library(par_computado_lib2 src/par_computado_vel.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(par_computado_lib ${catkin_LIBRARIES})
-target_link_libraries(par_computado_lib2 ${catkin_LIBRARIES})
-
-
+target_link_libraries(par_computado_lib ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+# target_link_libraries(par_computado_lib2 ${catkin_LIBRARIES})
 
 #############
 ## Install ##

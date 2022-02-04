@@ -6,10 +6,17 @@
 
   <!-- Load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" ns="/par_computado_ns" args="arm_controller gripper_controller joint_state_controller"/>
+    output="screen" args="gripper_controller arm_controller joint_state_controller"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false" />
+<!-- <rosparam param="/source_list">[/joint_states]</rosparam> -->
+  </node>
 
   <!-- Given the published joint states, publish tf for the robot links-->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true"
-    output="screen"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false"
+    output="screen">
+<!-- <remap from="/joint_states" to="/arm/joint_states" /> -->
+  </node>
 
 </launch>

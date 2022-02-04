@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+  <!-- launch gazebo -->
+  <include file="$(find ommp_lisa_moveit_config)/launch/gazebo.launch" />
+
+  <!-- launch moveit -->
+  <include file="$(find ommp_moveit_interface)/launch/moveit.launch" />
+
+  <!-- launch the moveit node -->
+  <node name="set_start_pos" pkg="ommp_moveit_interface" type="set_start_pos.py" respawn="false" />
+
+  <!-- launch rviz -->
+  <include file="$(find ommp_lisa_moveit_config)/launch/moveit_rviz.launch" /> 
+
+</launch>
+

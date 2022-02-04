@@ -27,7 +27,7 @@
   <!-- Load the Robot description -->
   
   <!-- send urdf to param server -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find ommp_description)/urdf/robots/$(arg robot)/$(arg robot).urdf.xacro' sim:=$(arg sim)" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(find ommp_description)/urdf/robots/$(arg robot)/$(arg robot).urdf' sim:=$(arg sim)" />
   <!--Start robot state publisher -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
