@@ -18,6 +18,6 @@ imu0_config: [false, false, false,
               false, false, false]
 imu0_differential: false
 
-odom_frame: odom
+odom_frame: map
 base_link_frame: robot_footprint
-world_frame: odom
+world_frame: map
