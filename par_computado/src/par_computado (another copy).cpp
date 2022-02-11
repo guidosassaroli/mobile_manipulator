@@ -6,7 +6,6 @@
 
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <trajectory_msgs/JointTrajectory.h>
-#include <geometry_msgs/PoseStamped.h>
 
 #include "actionlib/server/simple_action_server.h"
 #include <control_msgs/FollowJointTrajectoryAction.h>
@@ -139,7 +138,8 @@ namespace par_computado_ns
 
         void cancelCB(GoalHandle gh)
         {
-            if (active_goal_ == gh){
+            if (active_goal_ == gh)
+            {
             // Stops the controller.
             trajectory_msgs::JointTrajectory empty;
             empty.joint_names = joint_names_;
@@ -186,12 +186,6 @@ namespace par_computado_ns
 
             // sub_command_ = controller_nh_.subscribe("command",1, &ParComputado::commandCB, this);
             pub_controller_command_ = controller_nh_.advertise<trajectory_msgs::JointTrajectory>("command", 1);
-            pub_graficas1 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q1_dq1", 1);
-            pub_graficas2 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q2_dq2", 1);
-            pub_graficas3 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q3_dq3", 1);
-            pub_graficas4 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q4_dq4", 1);
-            pub_graficas5 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q5_dq5", 1);
-            pub_graficas6 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q6_dq6", 1);
 
             action_server_->start();
 
@@ -205,38 +199,6 @@ namespace par_computado_ns
                 q[i][0] = joints_[i].getPosition();
                 dq[i][0] = joints_[i].getVelocity();
             }
-
-            current_time = ros::Time::now();
-
-            msg1.header.stamp = current_time;
-            msg1.pose.position.x = q[0][0];
-            msg1.pose.position.y = dq[0][0];
-            pub_graficas1.publish(msg1);
-
-            msg2.header.stamp = current_time;
-            msg2.pose.position.x = q[1][0];
-            msg2.pose.position.y = dq[1][0];
-            pub_graficas2.publish(msg2);
-
-            msg3.header.stamp = current_time;
-            msg3.pose.position.x = q[2][0];
-            msg3.pose.position.y = dq[2][0];
-            pub_graficas3.publish(msg3);
-
-            msg4.header.stamp = current_time;
-            msg4.pose.position.x = q[3][0];
-            msg4.pose.position.y = dq[3][0];
-            pub_graficas4.publish(msg4);
-
-            msg5.header.stamp = current_time;
-            msg5.pose.position.x = q[4][0];
-            msg5.pose.position.y = dq[4][0];
-            pub_graficas5.publish(msg5);
-
-            msg6.header.stamp = current_time;
-            msg6.pose.position.x = q[5][0];
-            msg6.pose.position.y = dq[5][0];
-            pub_graficas6.publish(msg6);
 
             q_[0][0] = q[2][0];   // shoulder pan
             dq_[0][0] = dq[2][0];
@@ -401,10 +363,6 @@ namespace par_computado_ns
 
             std::vector<std::string> joint_names_;
             
-            ros::Publisher pub_graficas1, pub_graficas2, pub_graficas3, pub_graficas4, pub_graficas5, pub_graficas6;
-            geometry_msgs::PoseStamped msg1, msg2, msg3, msg4, msg5, msg6;
-            ros::Time current_time;
     };
-    
     PLUGINLIB_EXPORT_CLASS(par_computado_ns::ParComputado, controller_interface::ControllerBase);
 }

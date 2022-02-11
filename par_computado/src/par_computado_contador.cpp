@@ -6,7 +6,6 @@
 
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <trajectory_msgs/JointTrajectory.h>
-#include <geometry_msgs/PoseStamped.h>
 
 #include "actionlib/server/simple_action_server.h"
 #include <control_msgs/FollowJointTrajectoryAction.h>
@@ -37,10 +36,10 @@ namespace par_computado_ns
 
 
         //definicion parametros control
-        double kp1 = 2000, kp2 = 2000, kp3 = 2000, kp4 = 500, kp5 = 500, kp6 = 1;
-        double kv1 = 10, kv2 = 10, kv3 = 10, kv4 = 10, kv5 = 10, kv6 = 1;
-        double q1, q2, q3, q4, q5, q6;
-        double qd1, qd2, qd3, qd4, qd5, qd6;
+        double kp1 = 2000,kp2 = 2000,kp3 = 2000,kp4 = 500,kp5 = 500,kp6 = 1;
+        double kv1 = 10,kv2 = 10,kv3 = 10,kv4 = 10,kv5 = 10,kv6 = 1;
+        double q1,q2,q3,q4,q5,q6;
+        double qd1,qd2,qd3,qd4,qd5,qd6;
         double dq[6][1] = {{0},{0},{0},{0},{0},{0}};
         double q[6][1] = {{0},{0},{0},{0},{0},{0}};
         double dq_[6][1] = {{0},{0},{0},{0},{0},{0}};
@@ -71,7 +70,7 @@ namespace par_computado_ns
                           {0,0,0,kp4,0,0},
                           {0,0,0,0,kp5,0},
                           {0,0,0,0,0,kp6}
-                          };
+                        };
 
         bool action_torque = false;
         int contador = 0;
@@ -82,6 +81,7 @@ namespace par_computado_ns
         bool aux_6 = false;
         double torque_ant;
 
+        // double waypoints[6][50], d_waypoints[6][50], dd_waypoints[6][50];
 
         //goalCB
         void goalCB(GoalHandle gh)
@@ -109,37 +109,52 @@ namespace par_computado_ns
             traj = gh.getGoal()->trajectory;
             pub_controller_command_.publish(traj);
 
+            action_torque = true;
+            contador = 0;
+
+            // n = traj.points.size();
+            // for (unsigned int j = 0; i < n; j++){              
+            //     for (unsigned int i = 0; i < 6; i++){
+            //         waypoints[i][j] = traj.points[j].positions[i];
+            //         d_waypoints[i][j] = traj.points[j].velocities[i];
+            //         dd_waypoints[i][j] = traj.points[j].accelerations[i];
+            //     }
+            // }
+
             n = traj.points.size();            
-            for (unsigned int i = 0; i < 6; i++){                
-                qr[i][0] = traj.points[n-1].positions[i];
-                dqr[i][0] = traj.points[n-1].velocities[i];
-                ddqr[i][0] = traj.points[n-1].accelerations[i];
-            }
+            // for (unsigned int i = 0; i < 6; i++){                
+            //     qr[i][0] = traj.points[n-1].positions[i];
+            //     dqr[i][0] = traj.points[n-1].velocities[i];
+            //     ddqr[i][0] = traj.points[n-1].accelerations[i];
+            // }
 
-            qr_[0][0] = qr[2][0];   // shoulder pan
-            dqr_[0][0] = dqr[2][0];
-            ddqr_[0][0] = ddqr[2][0];
+            // qr_[0][0] = qr[2][0];   // shoulder pan
+            // dqr_[0][0] = dqr[2][0];
+            // ddqr_[0][0] = ddqr[2][0];
 
-            qr_[1][0] = qr[1][0];   // shoulder lift
-            dqr_[1][0] = dqr[1][0];
-            ddqr_[1][0] = ddqr[1][0];
+            // qr_[1][0] = qr[1][0];   // shoulder lift
+            // dqr_[1][0] = dqr[1][0];
+            // ddqr_[1][0] = ddqr[1][0];
 
-            qr_[2][0] = qr[0][0];   // elbow
-            dqr_[2][0] = dqr[0][0];
-            ddqr_[2][0] = ddqr[0][0];
+            // qr_[2][0] = qr[0][0];   // elbow
+            // dqr_[2][0] = dqr[0][0];
+            // ddqr_[2][0] = ddqr[0][0];
 
-            for (unsigned int i = 3; i < 6; i++){                
-                qr_[i][0] = qr[i][0];
-                dqr_[i][0] = dqr[i][0];
-                ddqr_[i][0] = ddqr[i][0];
-            }
+
+            // for (unsigned int i = 3; i < 6; i++){                
+            //     qr_[i][0] = qr[i][0];
+            //     dqr_[i][0] = dqr[i][0];
+            //     ddqr_[i][0] = ddqr[i][0];
+            // }
 
             aux_6 = false;
+
         }
 
         void cancelCB(GoalHandle gh)
         {
-            if (active_goal_ == gh){
+            if (active_goal_ == gh)
+            {
             // Stops the controller.
             trajectory_msgs::JointTrajectory empty;
             empty.joint_names = joint_names_;
@@ -150,6 +165,7 @@ namespace par_computado_ns
             has_active_goal_ = false;
             }
         }
+        
 
         bool init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle &n, ros::NodeHandle& controller_nh_)
         {
@@ -186,12 +202,6 @@ namespace par_computado_ns
 
             // sub_command_ = controller_nh_.subscribe("command",1, &ParComputado::commandCB, this);
             pub_controller_command_ = controller_nh_.advertise<trajectory_msgs::JointTrajectory>("command", 1);
-            pub_graficas1 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q1_dq1", 1);
-            pub_graficas2 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q2_dq2", 1);
-            pub_graficas3 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q3_dq3", 1);
-            pub_graficas4 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q4_dq4", 1);
-            pub_graficas5 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q5_dq5", 1);
-            pub_graficas6 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q6_dq6", 1);
 
             action_server_->start();
 
@@ -206,38 +216,6 @@ namespace par_computado_ns
                 dq[i][0] = joints_[i].getVelocity();
             }
 
-            current_time = ros::Time::now();
-
-            msg1.header.stamp = current_time;
-            msg1.pose.position.x = q[0][0];
-            msg1.pose.position.y = dq[0][0];
-            pub_graficas1.publish(msg1);
-
-            msg2.header.stamp = current_time;
-            msg2.pose.position.x = q[1][0];
-            msg2.pose.position.y = dq[1][0];
-            pub_graficas2.publish(msg2);
-
-            msg3.header.stamp = current_time;
-            msg3.pose.position.x = q[2][0];
-            msg3.pose.position.y = dq[2][0];
-            pub_graficas3.publish(msg3);
-
-            msg4.header.stamp = current_time;
-            msg4.pose.position.x = q[3][0];
-            msg4.pose.position.y = dq[3][0];
-            pub_graficas4.publish(msg4);
-
-            msg5.header.stamp = current_time;
-            msg5.pose.position.x = q[4][0];
-            msg5.pose.position.y = dq[4][0];
-            pub_graficas5.publish(msg5);
-
-            msg6.header.stamp = current_time;
-            msg6.pose.position.x = q[5][0];
-            msg6.pose.position.y = dq[5][0];
-            pub_graficas6.publish(msg6);
-
             q_[0][0] = q[2][0];   // shoulder pan
             dq_[0][0] = dq[2][0];
 
@@ -250,6 +228,37 @@ namespace par_computado_ns
             for (unsigned int i = 3; i < 6; i++){                
                 q_[i][0] = q[i][0];
                 dq_[i][0] = dq[i][0];
+            }
+
+            if(action_torque){
+                for (unsigned int i = 0; i < 6; i++){
+                    qr[i][0] = traj.points[contador].positions[i];
+                    dqr[i][0] = traj.points[contador].velocities[i];
+                    ddqr[i][0] = traj.points[contador].accelerations[i];
+                }
+                if((abs(q[1][0]-qr[1][0])<0.2) && (abs(q[2][0]-qr[2][0])<0.2) && (abs(q[3][0]-qr[3][0])<0.2) && (abs(q[4][0]-qr[4][0])<0.2) && (abs(q[5][0]-qr[5][0])<0.2) && contador<n)
+                contador++;
+                else action_torque = false;
+                std::cout << contador << std::endl;
+            }
+
+            qr_[0][0] = qr[2][0];   // shoulder pan
+            dqr_[0][0] = dqr[2][0];
+            ddqr_[0][0] = ddqr[2][0];
+
+            qr_[1][0] = qr[1][0];   // shoulder lift
+            dqr_[1][0] = dqr[1][0];
+            ddqr_[1][0] = ddqr[1][0];
+
+            qr_[2][0] = qr[0][0];   // elbow
+            dqr_[2][0] = dqr[0][0];
+            ddqr_[2][0] = ddqr[0][0];
+
+
+            for (unsigned int i = 3; i < 6; i++){                
+                qr_[i][0] = qr[i][0];
+                dqr_[i][0] = dqr[i][0];
+                ddqr_[i][0] = ddqr[i][0];
             }
         
             double aux2 = 0;
@@ -322,38 +331,31 @@ namespace par_computado_ns
             }
 
             //Control del joint 5 
-            if(abs(q_[5][0]-qr_[5][0]) < 0.05){
+            if(abs(q_[5][0]-qr_[5][0]) < 0.1){
                 torque_ant = torque[5][0];
                 aux_6 = true;
             }
 
             if(aux_6 == false){
-                // for(unsigned int i = 0; i < 6; i++){
-                //     // joints_[i].setCommand(torque[i][0]);
-                //     std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
-                //     std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
-                //     joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
-                // }
-                joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
-                joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
-                joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 40.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 40.0), torque[4][0]));
-                joints_[5].setCommand(copysign(std::min(abs(torque[5][0]), 40.0), torque[5][0]));
-            }else{
-                // for(unsigned int i = 0; i < 5; i++){
-                //     // joints_[i].setCommand(torque[i][0]);
-                //     std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
-                //     std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
-                //     joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
-                // }
-                joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
-                joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
-                joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 40.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 40.0), torque[4][0]));
+                for(unsigned int i = 0; i < 6; i++){
+                    // joints_[i].setCommand(torque[i][0]);
+                    std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
+                    std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
+                    joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
+
+                }
+                }else{
+                for(unsigned int i = 0; i < 5; i++){
+                    // joints_[i].setCommand(torque[i][0]);
+                    std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
+                    std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
+                    joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
+
+                }
                 joints_[5].setCommand(torque_ant);
             }
+
+
         }
 
         void starting(const ros::Time &time) {
@@ -392,19 +394,14 @@ namespace par_computado_ns
             trajectory_msgs::JointTrajectory traj;
             ros::Publisher pub_controller_command_;
             ros::Subscriber sub_command_;
-            std::string name_;               // Controller name.
+            std::string name_;               ///< Controller name.
 
             std::vector<hardware_interface::JointHandle> joints_;
 
             bool has_active_goal_;
             GoalHandle active_goal_;
 
-            std::vector<std::string> joint_names_;
-            
-            ros::Publisher pub_graficas1, pub_graficas2, pub_graficas3, pub_graficas4, pub_graficas5, pub_graficas6;
-            geometry_msgs::PoseStamped msg1, msg2, msg3, msg4, msg5, msg6;
-            ros::Time current_time;
+            std::vector<std::string> joint_names_;            
     };
-    
     PLUGINLIB_EXPORT_CLASS(par_computado_ns::ParComputado, controller_interface::ControllerBase);
 }
