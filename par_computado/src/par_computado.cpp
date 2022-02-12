@@ -206,38 +206,6 @@ namespace par_computado_ns
                 dq[i][0] = joints_[i].getVelocity();
             }
 
-            current_time = ros::Time::now();
-
-            msg1.header.stamp = current_time;
-            msg1.pose.position.x = q[0][0];
-            msg1.pose.position.y = dq[0][0];
-            pub_graficas1.publish(msg1);
-
-            msg2.header.stamp = current_time;
-            msg2.pose.position.x = q[1][0];
-            msg2.pose.position.y = dq[1][0];
-            pub_graficas2.publish(msg2);
-
-            msg3.header.stamp = current_time;
-            msg3.pose.position.x = q[2][0];
-            msg3.pose.position.y = dq[2][0];
-            pub_graficas3.publish(msg3);
-
-            msg4.header.stamp = current_time;
-            msg4.pose.position.x = q[3][0];
-            msg4.pose.position.y = dq[3][0];
-            pub_graficas4.publish(msg4);
-
-            msg5.header.stamp = current_time;
-            msg5.pose.position.x = q[4][0];
-            msg5.pose.position.y = dq[4][0];
-            pub_graficas5.publish(msg5);
-
-            msg6.header.stamp = current_time;
-            msg6.pose.position.x = q[5][0];
-            msg6.pose.position.y = dq[5][0];
-            pub_graficas6.publish(msg6);
-
             q_[0][0] = q[2][0];   // shoulder pan
             dq_[0][0] = dq[2][0];
 
@@ -322,7 +290,7 @@ namespace par_computado_ns
             }
 
             //Control del joint 5 
-            if(abs(q_[5][0]-qr_[5][0]) < 0.05){
+            if(abs(q_[5][0]-qr_[5][0]) < 0.02){
                 torque_ant = torque[5][0];
                 aux_6 = true;
             }
@@ -337,9 +305,9 @@ namespace par_computado_ns
                 joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
                 joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
                 joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 40.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 40.0), torque[4][0]));
-                joints_[5].setCommand(copysign(std::min(abs(torque[5][0]), 40.0), torque[5][0]));
+                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 10.0), torque[3][0]));
+                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 10.0), torque[4][0]));
+                joints_[5].setCommand(copysign(std::min(abs(torque[5][0]), 10.0), torque[5][0]));
             }else{
                 // for(unsigned int i = 0; i < 5; i++){
                 //     // joints_[i].setCommand(torque[i][0]);
@@ -350,10 +318,62 @@ namespace par_computado_ns
                 joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
                 joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
                 joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 40.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 40.0), torque[4][0]));
+                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 10.0), torque[3][0]));
+                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 10.0), torque[4][0]));
                 joints_[5].setCommand(torque_ant);
             }
+
+
+            current_time = ros::Time::now();
+
+            msg1.header.stamp = current_time;
+            msg1.pose.position.x = q_[0][0];
+            msg1.pose.position.y = qr_[0][0];
+            msg1.pose.position.z = dq_[0][0];
+            msg1.pose.orientation.x = dqr_[0][0];
+            msg1.pose.orientation.y = torque_[0][0];
+            pub_graficas1.publish(msg1);
+
+            msg2.header.stamp = current_time;
+            msg2.pose.position.x = q_[1][0];
+            msg2.pose.position.y = qr_[1][0];
+            msg2.pose.position.z = dq_[1][0];
+            msg2.pose.orientation.x = dqr_[1][0];
+            msg2.pose.orientation.y = torque_[1][0];
+            pub_graficas2.publish(msg2);
+
+            msg3.header.stamp = current_time;
+            msg3.pose.position.x = q_[2][0];
+            msg3.pose.position.y = qr_[2][0];
+            msg3.pose.position.z = dq_[2][0];
+            msg3.pose.orientation.x = dqr_[2][0];
+            msg3.pose.orientation.y = torque_[2][0];
+            pub_graficas3.publish(msg3);
+
+            msg4.header.stamp = current_time;
+            msg4.pose.position.x = q_[3][0];
+            msg4.pose.position.y = qr_[3][0];
+            msg4.pose.position.z = dq_[3][0];
+            msg4.pose.orientation.x = dqr_[3][0];
+            msg4.pose.orientation.y = torque_[3][0];
+            pub_graficas4.publish(msg4);
+
+            msg5.header.stamp = current_time;
+            msg5.pose.position.x = q_[4][0];
+            msg5.pose.position.y = qr_[4][0];
+            msg5.pose.position.z = dq_[4][0];
+            msg5.pose.orientation.x = dqr_[4][0];
+            msg5.pose.orientation.y = torque_[4][0];
+            pub_graficas5.publish(msg5);
+
+            msg6.header.stamp = current_time;
+            msg6.pose.position.x = q_[5][0];
+            msg6.pose.position.y = qr_[5][0];
+            msg6.pose.position.z = dq_[5][0];
+            msg6.pose.orientation.x = dqr_[5][0];
+            msg6.pose.orientation.y = torque_[5][0];
+            pub_graficas6.publish(msg6);
+
         }
 
         void starting(const ros::Time &time) {
