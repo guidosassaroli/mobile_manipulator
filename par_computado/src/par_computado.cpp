@@ -35,10 +35,9 @@ namespace par_computado_ns
 
         ActionServerPtr    action_server_;
 
-
         //definicion parametros control
-        double kp1 = 2000, kp2 = 2000, kp3 = 2000, kp4 = 500, kp5 = 500, kp6 = 1;
-        double kv1 = 10, kv2 = 10, kv3 = 10, kv4 = 10, kv5 = 10, kv6 = 1;
+        double kp1 = 1750, kp2 = 1750, kp3 = 1750, kp4 = 500, kp5 = 750, kp6 = 1;
+        double kv1 = 50, kv2 = 50, kv3 = 50, kv4 = 15, kv5 = 25, kv6 = 1;
         double q1, q2, q3, q4, q5, q6;
         double qd1, qd2, qd3, qd4, qd5, qd6;
         double dq[6][1] = {{0},{0},{0},{0},{0},{0}};
@@ -289,39 +288,15 @@ namespace par_computado_ns
                 torque[i][0] = torque_[i][0];
             }
 
-            //Control del joint 5 
-            if(abs(q_[5][0]-qr_[5][0]) < 0.02){
-                torque_ant = torque[5][0];
-                aux_6 = true;
-            }
+            joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
+            joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
+            joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
+            joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 10.0), torque[3][0]));
+            joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 10.0), torque[4][0]));
 
-            if(aux_6 == false){
-                // for(unsigned int i = 0; i < 6; i++){
-                //     // joints_[i].setCommand(torque[i][0]);
-                //     std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
-                //     std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
-                //     joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
-                // }
-                joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
-                joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
-                joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 10.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 10.0), torque[4][0]));
-                joints_[5].setCommand(copysign(std::min(abs(torque[5][0]), 10.0), torque[5][0]));
-            }else{
-                // for(unsigned int i = 0; i < 5; i++){
-                //     // joints_[i].setCommand(torque[i][0]);
-                //     std::cout << "par: " << i << "   " << torque[i][0] << std::endl;
-                //     std::cout << "q: " << i << "   " << q_[i][0] << std::endl;
-                //     joints_[i].setCommand(copysign(std::min(abs(torque[i][0]), 50.0), torque[i][0]));
-                // }
-                joints_[0].setCommand(copysign(std::min(abs(torque[0][0]), 50.0), torque[0][0]));
-                joints_[1].setCommand(copysign(std::min(abs(torque[1][0]), 60.0), torque[1][0]));
-                joints_[2].setCommand(copysign(std::min(abs(torque[2][0]), 20.0), torque[2][0]));
-                joints_[3].setCommand(copysign(std::min(abs(torque[3][0]), 10.0), torque[3][0]));
-                joints_[4].setCommand(copysign(std::min(abs(torque[4][0]), 10.0), torque[4][0]));
-                joints_[5].setCommand(torque_ant);
-            }
+            error = qr[5][0] - joints_[5].getPosition();
+            U = error*10;   
+            joints_[5].setCommand(copysign(std::min(abs(U), 10.0), U));
 
 
             current_time = ros::Time::now();
