@@ -19,13 +19,10 @@
 
 #include <kdl/frames.hpp>
 
-// TODO: Figure out how to use tf2 DataConversions
-// for more elegant and compact code
-//#include <tf2_kdl/tf2_kdl.h>
-//#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
 #include <dynamic_reconfigure/server.h>
 #include <pure_pursuit/PurePursuitConfig.h>
+
+#include <tf/tf.h>
 
 using std::string;
 
@@ -90,15 +87,15 @@ private:
   
 };
 
-PurePursuit::PurePursuit() : ld_(1.0), v_max_(0.4), v_(v_max_), w_max_(1.5), pos_tol_(0.1), idx_(0),
+PurePursuit::PurePursuit() : ld_(1.0), v_max_(0.5), v_(v_max_), w_max_(2.0), pos_tol_(0.1), idx_(0),
                              goal_reached_(true), nh_private_("~"), tf_listener_(tf_buffer_),
                              map_frame_id_("map"), robot_frame_id_("robot_footprint"),
                              lookahead_frame_id_("lookahead")
 {
   // Get parameters from the parameter server
-  nh_private_.param<double>("lookahead_distance", ld_, 0.03);
-  nh_private_.param<double>("linear_velocity", v_, 0.4);
-  nh_private_.param<double>("max_rotational_velocity", w_max_, 1.5);
+  nh_private_.param<double>("lookahead_distance", ld_, 1);
+  nh_private_.param<double>("linear_velocity", v_, 0.5);
+  nh_private_.param<double>("max_rotational_velocity", w_max_, 2.0);
   nh_private_.param<double>("position_tolerance", pos_tol_, 0.1);
   nh_private_.param<string>("map_frame_id", map_frame_id_, "map");
   // Frame attached to midpoint of rear axle (for front-steered vehicles).
@@ -121,6 +118,19 @@ PurePursuit::PurePursuit() : ld_(1.0), v_max_(0.4), v_(v_max_), w_max_(1.5), pos
 
 void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
 {
+  double x_robot = odom.pose.pose.position.x;
+  double y_robot = odom.pose.pose.position.y;
+
+  tf::Quaternion q(
+        odom.pose.pose.orientation.x,
+        odom.pose.pose.orientation.y,
+        odom.pose.pose.orientation.z,
+        odom.pose.pose.orientation.w);
+    tf::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+
+
   // The velocity commands are computed, each time a new Odometry message is received.
   // Odometry is not used directly, but through the tf tree.
 
@@ -170,29 +180,29 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
       }
       else
       {
-        // We need to extend the lookahead distance beyond the goal point.
+        // // We need to extend the lookahead distance beyond the goal point.
       
-        // Find the intersection between the circle of radius ld
-        // centered at the robot (origin)
-        // and the line defined by the last path pose
-        double roll, pitch, yaw;
-        F_bl_end.M.GetRPY(roll, pitch, yaw);
-        double m = tan(yaw); // Slope of line defined by the last path pose
-        double q = F_bl_end.p.y() - m * F_bl_end.p.x();
-        double a = 1 + m * m;
-        double b = 2 * q;
-        double c = q * q - ld_ * ld_;
-        double D = sqrt(b*b - 4*a*c);
-        double x_ld = (-b + copysign(D,v_)) / (2*a);
-        double y_ld = m * x_ld + q;
+        // // Find the intersection between the circle of radius ld
+        // // centered at the robot (origin)
+        // // and the line defined by the last path pose
+        // double roll, pitch, yaw;
+        // F_bl_end.M.GetRPY(roll, pitch, yaw);
+        // double m = 1;
+        // double q = 0;
+        // double a = 1 + m * m;
+        // double b = 2 * q;
+        // double c = q * q - ld_ * ld_;
+        // double D = sqrt(b*b - 4*a*c);
+        // double x_ld = (-b + copysign(D,v_)) / (2*a);
+        // double y_ld = m * x_ld + q;
         
-        lookahead_.transform.translation.x = x_ld;
-        lookahead_.transform.translation.y = y_ld;
-        lookahead_.transform.translation.z = F_bl_end.p.z();
-        F_bl_end.M.GetQuaternion(lookahead_.transform.rotation.x,
-                                 lookahead_.transform.rotation.y,
-                                 lookahead_.transform.rotation.z,
-                                 lookahead_.transform.rotation.w);
+        // lookahead_.transform.translation.x = x_ld;
+        // lookahead_.transform.translation.y = y_ld;
+        // lookahead_.transform.translation.z = F_bl_end.p.z();
+        // F_bl_end.M.GetQuaternion(lookahead_.transform.rotation.x,
+        //                          lookahead_.transform.rotation.y,
+        //                          lookahead_.transform.rotation.z,
+        //                          lookahead_.transform.rotation.w);
       }
     }
 
@@ -204,16 +214,32 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
       // Right now,this is not very smart :)
       v_ = copysign(v_max_, v_);
       
+      double m = 1;
+      double q = 0;
+      double a = 1 + m * m;
+      double b = 2 * (-x_robot + m*q - m*y_robot);
+      double c = q*q + x_robot*x_robot - 2*q*y_robot + y_robot*y_robot - ld_*ld_;
+      double D = sqrt(b*b - 4*a*c);
+      double x_ld = (-b + copysign(D,v_)) / (2*a);
+      double y_ld = m * x_ld + q;
+      
       // Compute the angular velocity.
       // Lateral error is the y-value of the lookahead point (in base_link frame)
-      double yt = lookahead_.transform.translation.y;
+      double yt = sqrt((x_ld-x_robot)*(x_ld-x_robot) + (y_ld-y_robot)*(y_ld-y_robot));
       double ld_2 = ld_ * ld_;
-      cmd_vel_.angular.z = std::min( 2*v_ / ld_2 * yt, w_max_ );
+
+      double vec2goal_x = x_ld-x_robot;
+      double vec2goal_y = y_ld-y_robot;
+
+      double alpha = atan2(vec2goal_y, vec2goal_x) - yaw;
+
+      cmd_vel_.angular.z = copysign(std::min( 2*v_ / ld_2 * yt, w_max_ ), sin(alpha));
       
       // Set linear velocity for tracking.
       cmd_vel_.linear.x = v_;
-
     }
+
+
     else
     {
       // We are at the goal!

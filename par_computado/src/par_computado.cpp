@@ -183,7 +183,6 @@ namespace par_computado_ns
                                                     boost::bind(&ParComputado::cancelCB, this, _1),
                                                     false));
 
-            // sub_command_ = controller_nh_.subscribe("command",1, &ParComputado::commandCB, this);
             pub_controller_command_ = controller_nh_.advertise<trajectory_msgs::JointTrajectory>("command", 1);
             pub_graficas1 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q1_dq1", 1);
             pub_graficas2 = controller_nh_.advertise<geometry_msgs::PoseStamped>("q2_dq2", 1);

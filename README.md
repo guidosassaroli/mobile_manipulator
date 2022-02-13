@@ -1,57 +1,55 @@
 # SCHEME OF THE REPOSITORY 
 
-## launch sequence 
+Credits for the model to https://github.com/panagelak. 
+His project: https://github.com/panagelak/Open_Mobile_Manipulator.
 
-roslaunch ommp_lisa_moveit_config gazebo.launch
+
+# Compiling
+
+mkdir -p ~/catkin_ws/src && cd catkin_ws/src
+
+git clone https://github.com/guidosassaroli/mobile_manipulator 
+
+cd ~/catkin_ws
+
+rosdep install --from-paths src --ignore-src -r -y (install depedencies)
+
+catkin_make sometimes doesn't work so build with catkin build **install it from install catkin tools
+
+catkin build -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
+Now theoritically it should be easy to compile the project in ROS Melodic
+
+## launch sequence for the maniupulator controlled by the Computed Torque Control 
+
+roslaunch ommp_lisa2_moveit_config gazebo.launch
 
 roslaunch ommp_moveit_interface moveit.launch
 
-*facoltativo*
-rosrun ommp_moveit_interface set_start_pos.py 
-
-roslaunch ommp_lisa_moveit_config moveit_rviz.launch
+roslaunch ommp_lisa2_moveit_config moveit_rviz.launch
 
 
 
-## launch tree 
+# Launch sequence for the mobile robot controlled by the Pure Pursuit 
 
-1- basic.launch 
+roslaunch ommp_bringup sim_bringup.launch world:=jackal_race robot:=ommp_sim
 
-2- ommp_bringup/launch/sim_bringup.launch
-2- gazebo_ros/launch/empty_world.launch 
-2- robot_state_publisher, controller_spawner, controller_manager_group, robot_loalization 
+roslaunch ommp_navigation navigation_main.launch map:=jackal_race
 
-3- ommp_moveit_interface/launch/moveit.launch
-3- ommp_sim_moveit_config/launch/move_group.launch
-3- ommp_real_moveit_config/launch/move_group.launch
+roslaunch ommp_viz rviz.launch config:=navigation map:=jackal_race
 
-4- moveit node 
-
-5- ommp_navigation/launch/navigation_main.launch
-Run the map server and load the map file 
-5- ommp_navigation/launch/include/amcl.launch
-5- ommp_navigation/launch/include/amcl.launch AMCL params 
-
-6- ommp_navigation/launch/include/move_base.launch 
-
-7- rviz node 
+rosrun pure_pursuit pure_pursuit
 
 
 
+# How to get data from the simulation
 
-## to_arduino.ino 
+rostopic echo /odometry/filtered -p > odom.csv
 
-### ROS parameters 
+rostopic echo /_base/TrajectoryPlannerROS/global_plan -p > trayect.csv
 
-#### ROS Initilization
-The arduino file publishes the *encoder_ticks* as a Int64MultiArray and the *velocity_wheeles* as a Float64MultiArray.
+rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped 'der: {stamp: now, frame_id: "map"}, pose: {position: {x: 2.0, y: 2.0, z: 0.0}, orientation: {w: 1.0}}}'
 
-#### We set the PID callback
-We have a PID controller for heach wheel. 
-
-#### We set the cmd_vel callback
-
-It subscribes to the *set_vel* and to te *pid_set*
 
 
 
