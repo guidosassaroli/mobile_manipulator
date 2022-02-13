@@ -2,10 +2,8 @@
 <package>
   <name>pure_pursuit</name>
   <version>0.9.0</version>
-  <description>A pure pursuit path following algorithm.</description>
+  <description> Paquete controlador Pure Pursuit </description>
 
-  <author email="damjan.miklic@fer.hr">Damjan Miklic</author>
-  <maintainer email="damjan.miklic@fer.hr">Damjan Miklic</maintainer>
 
   <license>MIT</license>
   
@@ -21,10 +19,7 @@
   <!-- For dynamic reconfigure -->
   <build_depend>rospy</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
-  <!-- TODO: Figure out how to use tf2 DataConversions -->
-  <!--build_depend>tf2_kdl</build_depend-->
-  <!--build_depend>tf2_geometry_msgs</build_depend-->
-  
+
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
@@ -36,9 +31,6 @@
   <!-- For dynamic reconfigure -->
   <run_depend>rospy</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
-  <!-- TODO: Figure out how to use tf2 DataConversions -->
-  <!--run_depend>tf2_kdl</run_depend-->
-  <!--run_depend>tf2_geometry_msgs</run_depend-->
   
   <!-- The export tag contains other, unspecified, tags -->
   <export>
