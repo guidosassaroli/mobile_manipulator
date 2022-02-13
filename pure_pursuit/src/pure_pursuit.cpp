@@ -12,10 +12,14 @@
 
 #include <kdl/frames.hpp>
 
-#include <dynamic_reconfigure/server.h>
 #include <pure_pursuit/PurePursuitConfig.h>
 
 #include <tf/tf.h>
+
+#include <iostream>
+#include <iterator>
+#include <random>
+#include <cstdlib>
 
 using std::string;
 
@@ -32,15 +36,14 @@ public:
   //! Receive path to follow.
   void receivePath(nav_msgs::Path path);
 
-  //! Compute transform that transforms a pose into the robot frame (base_link)
+  //! Compute transform that transforms a pose into the robot frame (robot_footprint)
   KDL::Frame transformToBaseLink(const geometry_msgs::Pose& pose,
                                  const geometry_msgs::Transform& tf);
   
-  //! Helper founction for computing eucledian distances in the x-y plane.
-  template<typename T1, typename T2>
-  double distance(T1 pt1, T2 pt2)
-  {
-    return sqrt(pow(pt1.x - pt2.x,2) + pow(pt1.y - pt2.y,2) + pow(pt1.z - pt2.z,2));
+  //Function for computing eucledian distances in the x-y plane.
+   double distance(double x1, double y1, double x2, double y2)  
+  {   
+    return sqrt(pow(x1 - x2,2) + pow(y1 - y2,2));
   }
 
   //! Run the controller.
@@ -48,9 +51,6 @@ public:
   
 private:
 
-  //! Dynamic reconfigure callback.
-  void reconfigure(pure_pursuit::PurePursuitConfig &config, uint32_t level);
-  
   // Vehicle parameters
   double L_;
   // Algorithm variables
@@ -75,20 +75,19 @@ private:
   string map_frame_id_, robot_frame_id_, lookahead_frame_id_;
   // string acker_frame_id_;
 
-  dynamic_reconfigure::Server<pure_pursuit::PurePursuitConfig> reconfigure_server_;
-  dynamic_reconfigure::Server<pure_pursuit::PurePursuitConfig>::CallbackType reconfigure_callback_;
+
   
 };
 
-PurePursuit::PurePursuit() : ld_(0.5), v_max_(0.5), v_(v_max_), w_max_(1.5), pos_tol_(0.1), idx_(0),
+PurePursuit::PurePursuit() : ld_(0.7), v_max_(0.2), v_(v_max_), w_max_(0.4), pos_tol_(0.1), idx_(0),
                              goal_reached_(true), nh_private_("~"), tf_listener_(tf_buffer_),
                              map_frame_id_("map"), robot_frame_id_("robot_footprint"),
                              lookahead_frame_id_("lookahead")
 {
   // Get parameters from the parameter server
-  nh_private_.param<double>("lookahead_distance", ld_, 0.5);
-  nh_private_.param<double>("linear_velocity", v_, 0.5);
-  nh_private_.param<double>("max_rotational_velocity", w_max_, 1.5);
+  nh_private_.param<double>("lookahead_distance", ld_, 0.7);
+  nh_private_.param<double>("linear_velocity", v_, 0.2);
+  nh_private_.param<double>("max_rotational_velocity", w_max_, 0.4);
   nh_private_.param<double>("position_tolerance", pos_tol_, 0.1);
   nh_private_.param<string>("map_frame_id", map_frame_id_, "map");
   // Frame attached to midpoint of rear axle (for front-steered vehicles).
@@ -105,8 +104,7 @@ PurePursuit::PurePursuit() : ld_(0.5), v_max_(0.5), v_(v_max_), w_max_(1.5), pos
   sub_odom_ = nh_.subscribe("/odometry/filtered", 1, &PurePursuit::computeVelocities, this);
   pub_vel_ = nh_.advertise<geometry_msgs::Twist>("/ommp_velocity_controller/cmd_vel", 1);
 
-  reconfigure_callback_ = boost::bind(&PurePursuit::reconfigure, this, _1, _2);
-  reconfigure_server_.setCallback(reconfigure_callback_);
+ 
 }
 
 void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
@@ -123,10 +121,6 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
 
-
-  // The velocity commands are computed, each time a new Odometry message is received.
-  // Odometry is not used directly, but through the tf tree.
-
   // Get the current robot pose
   geometry_msgs::TransformStamped tf;
   try
@@ -136,10 +130,10 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
     // path information and lookahead distance.
     for (; idx_ < path_.poses.size(); idx_++)
     {
-      if (distance(path_.poses[idx_].pose.position, tf.transform.translation) > ld_)
+      if (distance(path_.poses[idx_].pose.position.x, path_.poses[idx_].pose.position.y, tf.transform.translation.x, tf.transform.translation.y) > ld_)
       {
 
-        // Transformed lookahead to base_link frame is lateral error
+        // Transformed lookahead to robot_footprint frame is lateral error
         KDL::Frame F_bl_ld = transformToBaseLink(path_.poses[idx_].pose, tf.transform);
         lookahead_.transform.translation.x = F_bl_ld.p.x();
         lookahead_.transform.translation.y = F_bl_ld.p.y();
@@ -148,9 +142,6 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
                                 lookahead_.transform.rotation.y,
                                 lookahead_.transform.rotation.z,
                                 lookahead_.transform.rotation.w);
-        
-        // TODO: See how the above conversion can be done more elegantly
-        // using tf2_kdl and tf2_geometry_msgs
 
         break;
       }
@@ -160,7 +151,7 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
     {
       // We are approaching the goal, which is closer than ld
 
-      // This is the pose of the goal w.r.t. the base_link frame
+      // This is the pose of the goal w.r.t. the robot_footprint frame
       KDL::Frame F_bl_end = transformToBaseLink(path_.poses.back().pose, tf.transform);
 
       if (fabs(F_bl_end.p.x()) <= pos_tol_)
@@ -173,72 +164,88 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
       }
       else
       {
-        // // We need to extend the lookahead distance beyond the goal point.
-      
-        // // Find the intersection between the circle of radius ld
-        // // centered at the robot (origin)
-        // // and the line defined by the last path pose
-        // double roll, pitch, yaw;
-        // F_bl_end.M.GetRPY(roll, pitch, yaw);
-        // double m = 1;
-        // double q = 0;
-        // double a = 1 + m * m;
-        // double b = 2 * q;
-        // double c = q * q - ld_ * ld_;
-        // double D = sqrt(b*b - 4*a*c);
-        // double x_ld = (-b + copysign(D,v_)) / (2*a);
-        // double y_ld = m * x_ld + q;
-        
-        // lookahead_.transform.translation.x = x_ld;
-        // lookahead_.transform.translation.y = y_ld;
-        // lookahead_.transform.translation.z = F_bl_end.p.z();
-        // F_bl_end.M.GetQuaternion(lookahead_.transform.rotation.x,
-        //                          lookahead_.transform.rotation.y,
-        //                          lookahead_.transform.rotation.z,
-        //                          lookahead_.transform.rotation.w);
       }
     }
 
     if (!goal_reached_)
-    {
-      // We are tracking.
+    { 
 
-      // Compute linear velocity.
-      // Right now,this is not very smart :)
-      v_ = copysign(v_max_, v_);
+
+
+      for( unsigned int n = 0; n<path_.poses.size() && n<10000 ;n++)
+      {
+        // We are tracking.
+        // Compute linear velocity.
+        v_ = copysign(v_max_, v_);
+
+        //RANDOM NOISE 
+        // noisex = (rand() % 100 + -50)/100;
+        // noisey = (rand() % 100 + -50)/100;
+
+
+        //GAUSSIAN NOISE 
+        // std::default_random_engine generator;
+        // std::normal_distribution<double> distribution(0.0, 0.0125);
+        // double noisex = distribution(generator);
+        // // std::cout << noisex << std::endl;  
+        // std::default_random_engine generator2;
+        // double noisey = distribution(generator2);
+        // // std::cout << noisex << std::endl;  
+
+        // double w_x1 = path_.poses[n].pose.position.x + noisex;
+        // double w_y1 = path_.poses[n].pose.position.y + noisey;
+
+
+        double w_x1 = path_.poses[n].pose.position.x;
+        double w_y1 = path_.poses[n].pose.position.y;
+        
+        
+        // double w_x2 = path_.poses[n+1].pose.position.x;
+        // double w_y2 = path_.poses[n+1].pose.position.y;
+        double m = 1;
+        double q = w_y1 - m*w_x1;
+        double a = 1 + m * m;
+        double b = 2 * (-x_robot + m*q - m*y_robot);
+        double c = q*q + x_robot*x_robot - 2*q*y_robot + y_robot*y_robot - ld_*ld_;
+
+
+        // double e_x = w_x2 - w_x1; 
+        // double e_y = w_y2 - w_y1; 
+        // double a = 1 + (e_x*e_x)/(e_y*e_y); 
+        // double b = -2*w_x1*((e_x*e_x)/(e_y*e_y))+ 2*w_y1*((e_x*e_y)/(e_y)); 
+        // double c = ((w_x1*w_x1)/(e_x*e_x)) * (e_y*e_y) + (w_y1*w_y1) - ((2*w_y1*w_x1*w_y1)/e_x)-ld_*ld_;
+        // double m = e_y/e_x;
+        // double q = w_y1 - m*w_x1;
+
+
+        // double a = 1 + m * m;
+        // double b = 2 * (-x_robot + m*q - m*y_robot);
+        // double c = q*q + x_robot*x_robot - 2*q*y_robot + y_robot*y_robot - ld_*ld_;
+        double D = sqrt(b*b - 4*a*c);
+        double x_ld = (-b + copysign(D,v_)) / (2*a);
+        double y_ld = m * x_ld + q;
+        
+        // Compute the angular velocity y el error lateral
+        double yt = sqrt((x_ld-x_robot)*(x_ld-x_robot) + (y_ld-y_robot)*(y_ld-y_robot));
+        double ld_2 = ld_ * ld_;
+        double vec2goal_x = x_ld-x_robot;
+        double vec2goal_y = y_ld-y_robot;
+
+        double alpha = atan2(vec2goal_y, vec2goal_x) - yaw;
+
+        cmd_vel_.angular.z = copysign(std::min( 2*v_ / ld_2 * yt, w_max_ ), sin(alpha));
+        
+        // Set linear velocity for tracking.
+        cmd_vel_.linear.x = v_;
+
+      }
       
-      double m = 1;
-      double q = 0;
-      double a = 1 + m * m;
-      double b = 2 * (-x_robot + m*q - m*y_robot);
-      double c = q*q + x_robot*x_robot - 2*q*y_robot + y_robot*y_robot - ld_*ld_;
-      double D = sqrt(b*b - 4*a*c);
-      double x_ld = (-b + copysign(D,v_)) / (2*a);
-      double y_ld = m * x_ld + q;
-      
-      // Compute the angular velocity.
-      // Lateral error is the y-value of the lookahead point (in base_link frame)
-      double yt = sqrt((x_ld-x_robot)*(x_ld-x_robot) + (y_ld-y_robot)*(y_ld-y_robot));
-      double ld_2 = ld_ * ld_;
-
-      double vec2goal_x = x_ld-x_robot;
-      double vec2goal_y = y_ld-y_robot;
-
-      double alpha = atan2(vec2goal_y, vec2goal_x) - yaw;
-
-      cmd_vel_.angular.z = copysign(std::min( 2*v_ / ld_2 * yt, w_max_ ), sin(alpha));
-      
-      // Set linear velocity for tracking.
-      cmd_vel_.linear.x = v_;
     }
 
 
     else
     {
-      // We are at the goal!
-
-      // Stop the vehicle
-      
+      // We are at the goal-> Stop the vehicle
       // The lookahead target is at our current pose.
       lookahead_.transform = geometry_msgs::Transform();
       lookahead_.transform.rotation.w = 1.0;
@@ -258,7 +265,7 @@ void PurePursuit::computeVelocities(nav_msgs::Odometry odom)
   }
   catch (tf2::TransformException &ex)
   {
-    ROS_WARN_STREAM(ex.what());
+    std::cout << "error"<< std::endl;  
   }
 }
 
@@ -267,8 +274,6 @@ void PurePursuit::receivePath(nav_msgs::Path new_path)
   // When a new path received, the previous one is simply discarded
   // It is up to the planner/motion manager to make sure that the new
   // path is feasible.
-  // Callbacks are non-interruptible, so this will
-  // not interfere with velocity computation callback.
   
   if (new_path.header.frame_id == map_frame_id_)
   {
@@ -281,14 +286,12 @@ void PurePursuit::receivePath(nav_msgs::Path new_path)
     else
     {
       goal_reached_ = true;
-      ROS_WARN_STREAM("Received empty path!");
+      std::cout << "error"<< std::endl;  
     }
   }
   else
   {
-    ROS_WARN_STREAM("The path must be published in the " << map_frame_id_
-                    << " frame! Ignoring path in " << new_path.header.frame_id
-                    << " frame!");
+    std::cout << "error"<< std::endl;  
   }
   
 }
@@ -305,7 +308,7 @@ KDL::Frame PurePursuit::transformToBaseLink(const geometry_msgs::Pose& pose,
                                     pose.position.y,
                                     pose.position.z));
 
-  // Robot (base_link) in global (map) frame
+  // Robot (robot_footprint) in global (map) frame
   KDL::Frame F_map_tf(KDL::Rotation::Quaternion(tf.rotation.x,
                                                 tf.rotation.y,
                                                 tf.rotation.z,
@@ -313,9 +316,6 @@ KDL::Frame PurePursuit::transformToBaseLink(const geometry_msgs::Pose& pose,
                       KDL::Vector(tf.translation.x,
                                   tf.translation.y,
                                   tf.translation.z));
-
-  // TODO: See how the above conversions can be done more elegantly
-  // using tf2_kdl and tf2_geometry_msgs
 
   return F_map_tf.Inverse()*F_map_pose;
 }
@@ -325,10 +325,6 @@ void PurePursuit::run()
   ros::spin();
 }
 
-void PurePursuit::reconfigure(pure_pursuit::PurePursuitConfig &config, uint32_t level)
-{
-  v_max_ = config.max_linear_velocity;
-}
 
 int main(int argc, char**argv)
 {
