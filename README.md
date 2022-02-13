@@ -20,6 +20,19 @@ catkin build -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 
 Now theoritically it should be easy to compile the project in ROS Melodic
 
+# Launch sequence for the mobile robot controlled by the Pure Pursuit and manipulator controlled by the Computed Torque Control
+
+roslaunch ommp_bringup complete.launch world:=jackal_race robot:=ommp_sim
+
+roslaunch ommp_moveit_interface moveit.launch
+
+roslaunch ommp_navigation navigation_main.launch map:=jackal_race
+
+roslaunch ommp_viz rviz.launch config:=todo
+
+rosrun pure_pursuit pure_pursuit
+
+
 ## launch sequence for the maniupulator controlled by the Computed Torque Control 
 
 roslaunch ommp_lisa2_moveit_config gazebo.launch
