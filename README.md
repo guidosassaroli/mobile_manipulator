@@ -3,6 +3,10 @@
 Credits for the model to https://github.com/panagelak. 
 His project: https://github.com/panagelak/Open_Mobile_Manipulator.
 
+# Our job 
+We have designed and implemented a Computer Torque Control node for the manipulator. 
+We have designed and implemented a Pure Pursuit Control for the mobile platform. 
+
 
 # Compiling
 
