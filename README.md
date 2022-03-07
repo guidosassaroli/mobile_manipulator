@@ -7,6 +7,10 @@ His project: https://github.com/panagelak/Open_Mobile_Manipulator.
 We have designed and implemented a Computer Torque Control node for the manipulator. 
 We have designed and implemented a Pure Pursuit Control for the mobile platform. 
 
+The report of our project is in the file PROYECTO_CPR_N16.pdf but it is written in Spanish. 
+
+We have tested a several type of controllers and we have added some noise to test the robustness of our controllers. 
+
 
 # Compiling
 
