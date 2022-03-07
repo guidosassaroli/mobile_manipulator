@@ -1,4 +1,4 @@
-#THE REPOSITORY 
+# THE REPOSITORY 
 
 Credits for the model to https://github.com/panagelak. 
 His project: https://github.com/panagelak/Open_Mobile_Manipulator.
