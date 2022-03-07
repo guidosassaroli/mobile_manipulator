@@ -1,9 +1,9 @@
-# SCHEME OF THE REPOSITORY 
+#THE REPOSITORY 
 
 Credits for the model to https://github.com/panagelak. 
 His project: https://github.com/panagelak/Open_Mobile_Manipulator.
 
-# Our job 
+## Our job 
 We have designed and implemented a Computer Torque Control node for the manipulator. 
 We have designed and implemented a Pure Pursuit Control for the mobile platform. 
 
@@ -12,7 +12,7 @@ The report of our project is in the file PROYECTO_CPR_N16.pdf but it is written 
 We have tested a several type of controllers and we have added some noise to test the robustness of our controllers. 
 
 
-# Compiling
+## Compiling
 
 mkdir -p ~/catkin_ws/src && cd catkin_ws/src
 
@@ -30,7 +30,7 @@ catkin build -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 
 Now theoritically it should be easy to compile the project in ROS Melodic
 
-# Launch sequence for the mobile robot controlled by the Pure Pursuit and manipulator controlled by the Computed Torque Control
+## Launch sequence for the mobile robot controlled by the Pure Pursuit and manipulator controlled by the Computed Torque Control
 
 roslaunch ommp_bringup complete.launch world:=jackal_race robot:=ommp_sim
 
@@ -43,7 +43,7 @@ roslaunch ommp_viz rviz.launch config:=todo
 rosrun pure_pursuit pure_pursuit
 
 
-## launch sequence for the maniupulator controlled by the Computed Torque Control 
+### launch sequence for the maniupulator controlled by the Computed Torque Control 
 
 roslaunch ommp_lisa2_moveit_config gazebo.launch
 
@@ -53,7 +53,7 @@ roslaunch ommp_lisa2_moveit_config moveit_rviz.launch
 
 
 
-# Launch sequence for the mobile robot controlled by the Pure Pursuit 
+## Launch sequence for the mobile robot controlled by the Pure Pursuit 
 
 roslaunch ommp_bringup sim_bringup.launch world:=jackal_race robot:=ommp_sim
 
@@ -65,7 +65,7 @@ rosrun pure_pursuit pure_pursuit
 
 
 
-# How to get data from the simulation Pure Pursuit
+## How to get data from the simulation Pure Pursuit
 
 First load the Pure Pursuit
 
@@ -76,7 +76,7 @@ rostopic echo /_base/TrajectoryPlannerROS/global_plan -p > trayect.csv
 rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped 'der: {stamp: now, frame_id: "map"}, pose: {position: {x: 2.0, y: 2.0, z: 0.0}, orientation: {w: 1.0}}}'
 
 
-# How to get data from the simulation Pure Pursuit
+## How to get data from the simulation Pure Pursuit
 
 First load the Par Computado
 
